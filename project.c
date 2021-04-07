@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Due to the nature of the current circumstances, peripherals could be used to simulate the real world application
 //Jac
@@ -33,18 +34,24 @@ char *leaveRoom(int id){
     return arr[id-1][6];
 };
 
-checkTemperature(value){
+int checkTemperature(id){
+    float value = ((rand()%(42-33+1))+33);
+
     if(value<37.8&&value>35){
-        return 0;
+        arr[id-1][4] = "0";
+        return "0";
     }
-    return 1;
+    arr[id-1][4] = "1";
+    return "1";
 };
 
 int main()
 {
-    printf("Hello world!\n");
-    printf(enterRoom(3));
+    srand(time(0));
 
+    printf("Covid test\n");
+
+    //printf(enterRoom(3));
     //enterRoom();
     return 0;
 }
