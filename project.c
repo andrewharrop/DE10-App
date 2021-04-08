@@ -6,6 +6,14 @@
 // Due to the nature of the current circumstances, peripherals could be used to simulate the real world application
 //Jac
 
+//define pointers to key addresses
+volatile int * SW_ptr = (int *)SW_BASE;
+volatile int * KEY_ptr = (int *)KEY_BASE;
+volatile int * LED_ptr = (int *)LED_BASE;
+volatile int * HEX_ptr = (int *)HEX3_HEX0_BASE;
+volatile int * HEX2_ptr = (int *)HEX5_HEX4_BASE;
+
+
 #define NUMBER_OF_STUDENTS 9
 #define NUMBER_OF_TEACHERS 1
     //Structure: {ID, First Name, Last Name, Email, Flag(0:fine,1:temp is bad), InRoom}
