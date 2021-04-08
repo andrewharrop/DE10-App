@@ -2,10 +2,15 @@
 #include <stdlib.h>
 #include <time.h>
 
-//#include "address_map_arm.h"
+#include "address_map_arm.h"
 
+//define pointers to key addresses
 volatile int * SW_ptr = (int *)SW_BASE;
+volatile int * KEY_ptr = (int *)KEY_BASE;
 volatile int * LED_ptr = (int *)LED_BASE;
+volatile int * HEX_ptr = (int *)HEX3_HEX0_BASE;
+volatile int * HEX2_ptr = (int *)HEX5_HEX4_BASE;
+
 
 #define NUMBER_OF_STUDENTS 9
 #define NUMBER_OF_TEACHERS 1
@@ -88,6 +93,33 @@ int bin_dec_index_converter(int data){
     }
 }
 
+
+void DisplayHex(int value)
+{
+	/*Make an array of 10 elements each representing hex numbers 1-9 */
+   int lookUpTable[10];
+  
+  /*Assign each value in the array to 1-9 according to each hex value*/
+   lookUpTable[0] = 0x3F;
+   lookUpTable[1] = 0x6;
+   lookUpTable[2] = 0x5B;
+   lookUpTable[3] = 0x4F;
+   lookUpTable[4] = 0x66;
+   lookUpTable[5] = 0x6D;
+   lookUpTable[6] = 0x7D;
+   lookUpTable[7] = 0x7;
+   lookUpTable[8] = 0x7F;
+   lookUpTable[9] = 0x6F;
+
+   if(value < 10)
+   {
+   *(HEX_ptr) = lookUpTable[value];
+   }
+    
+    else{
+    }
+};
+    
 int main()
 {
     int delay_count;
