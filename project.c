@@ -1,8 +1,12 @@
+
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "address_map_arm.h"
+//#include "address_map_arm.h"
 
 //define pointers to key addresses
 volatile int * SW_ptr = (int *)SW_BASE;
@@ -11,12 +15,13 @@ volatile int * LED_ptr = (int *)LED_BASE;
 volatile int * HEX_ptr = (int *)HEX3_HEX0_BASE;
 volatile int * HEX2_ptr = (int *)HEX5_HEX4_BASE;
 
-
+// Definitions for the data structure
 #define NUMBER_OF_STUDENTS 9
 #define NUMBER_OF_TEACHERS 1
-    //Structure: {ID, First Name, Last Name, Email, Flag(0:fine,1:temp is bad), InRoom}
+
+//Structure: {ID, First Name, Last Name, Email, Flag(0:fine,1:temp is bad), InRoom}
 char *arr[NUMBER_OF_STUDENTS+NUMBER_OF_TEACHERS][20] = {
-    {"1", "John", "Smith", "jsmith@school.com", "0","Teacher", "1"},
+    {"1", "John", "Smith", "jsmith@school.com", "0","Teacher", "0"},
     {"2", "Suzy", "Smuth", "ssmuth@school.com", "0","Student","0"},
     {"3", "Alex", "Doe", "adoe@school.com", "0","Student", "0"},
     {"4", "Jane", "Doe", "jdoe@school.com", "0","Student", "0"},
@@ -28,47 +33,54 @@ char *arr[NUMBER_OF_STUDENTS+NUMBER_OF_TEACHERS][20] = {
     {"10", "Donald", "Trump", "dtrump@school.com", "0","Student", "0"}
 };
 
+int lights = 0;  // Lights on: lights=1, lights off: lights=0
 
+
+// Change user state to in room, perform checks here to switch on lights
 char *enterRoom(int id){
-    // Here we would have some temperature checks, but will use random values instead
-    //For convenience, we can just reference the index
-
-    // Set them to be "in" the room
     arr[id-1][6]="1";
     return arr[id-1][6];
 };
 
-//Allow person to leave the room, setting the field to 0
+// Change user state to out of room, perform checks here to switch off lights
 char *leaveRoom(int id){
     arr[id-1][6]="0";
     return arr[id-1][6];
 };
 
-//Check the temperature for a person, uses a random number
+// Perform temperature check
 int checkTemperature(id){
     float value = ((rand()%(42-33+1))+33);
    
     /*
-    Display temperature on LCD here
+    Display temperature on LCD here.
+    Display -> Sleep -> Clear
     */
 
+
+    //Flag a person if there temperature is not between 35-37.8 degrees celcius
     if(value<37.8&&value>35){
         arr[id-1][4] = "0";
         return "0";
     }
     arr[id-1][4] = "1";
-
     return "1";
 };
 
-//Return integer value from buttons
+// Read value from switches
 int read_switches(void){
     return *(SW_ptr);
 }
+
+// Read value from push buttons
+int read_push_buttons(void){
+    return *(KEY_ptr);
+}
+
+// Convert distinct selected switch to a unique integer from 1-10.  If no or more than one switch is selected, return 0
+// The calculation for this is n = log2(data)-1, where n is the return value as long as it is a whole number and is between 1-10
 int bin_dec_index_converter(int data){
-    if(data==0){
-        return 0;
-    }else if(data==1){
+    if(data==1){
         return 1;
     }else if(data==2){
         return 2;
@@ -90,6 +102,61 @@ int bin_dec_index_converter(int data){
         return 10;
     }else{
         return 0;
+    }
+}
+
+void check_lights(){
+    int in_room=0;
+    for(int i =0; i<10;i++){
+		
+        if(arr[i][6]=="1"){
+            in_room=1;
+        }
+    }
+	//printf("%d",in_room);
+	int off_delay = 50000;
+    if(in_room==1){
+        *(LED_ptr) = 0xFFFFFFFF;
+    }else{
+		//Animation if lights are off
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0xF0000000;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x0F000000;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x00F00000;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x000F0000;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x0000F000;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x00000F00;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x000000F0;
+		for(int j=0; j<off_delay; j++);
+		*(LED_ptr) = 0x0000000F;
+
+
+	}
+}
+// Conditional execution based on the button pressed.
+int process_buttons(int input, int id){
+    printf("\n");
+    switch(input){
+        case 1:
+            printf("enter room");
+            
+            break;
+        case 2:
+            printf("exit room");
+            break;
+        case 3:
+            printf("Check temperature");
+            break;
+        case 4:
+            printf("light status");
+			check_lights();
+            break;
     }
 }
 
@@ -122,30 +189,45 @@ void DisplayHex(int value)
     
 int main()
 {
-    int delay_count;
-    int current = 0;
-    int sv;
+    int delay_count; // To slow down the program for human consumption.  Uncomment in production.
+
+    int switch_value, converted_switch_value; // These two values will be used to track the binary and decimal switch values respectively
+    int button_value, converted_button_value; // These two values will be used to track the binary and decimal button values respectively
+
     while(1){
         for(delay_count=350000; delay_count>0;delay_count--);
-        current = read_switches();
-        sv = bin_dec_index_converter(current);
-        if(sv ==0){
-            *(LED_ptr) = 0x0000000;
+        
+        // Reading and converting values from switches
+        switch_value = read_switches(); //E.g. 0,1,2,4,8,16,32 ...
+        converted_switch_value = bin_dec_index_converter(switch_value); // = log2(switch_value)-1 as long as it is whole and between 1-10
 
-        }else{
+        // Reading and converting values from buttons
+        button_value = read_push_buttons(); //E.g. 0,1,2,4,8,16,32 ...
+        converted_button_value = bin_dec_index_converter(button_value); // = log2(button_value)-1 as long as it is whole and between 1-10
+        
+        // If the converted value read on the switches is a whole number and is between 1-10 when applied to log2(x)-1
+        if(converted_switch_value){
+            
+            // Set led to current switch, already sanitized
             *(LED_ptr) = read_switches();
-            printf("\n");
-            printf("%d",bin_dec_index_converter(current));
+            
+            //Check if there is a distinct active push button, cannot check the lights here
+            if(4>converted_button_value>0){
+                process_buttons(converted_button_value, converted_switch_value);
+                *(KEY_ptr)=0x00000000;
+            }
+            
+                
+            
+        }else{
+            // Set the led blank
+            *(LED_ptr) = 0x0000000;
+            if(converted_button_value==4){
+                process_buttons(converted_button_value,0);
+            }
         }
 
-
-
     }
-    // srand(time(0));
 
-    // printf("Covid test\n");
-
-    //printf(enterRoom(3));
-    //enterRoom();
     return 0;
 }
