@@ -1,7 +1,4 @@
 
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -64,6 +61,7 @@ int checkTemperature(id){
         return "0";
     }
     arr[id-1][4] = "1";
+	arr[id-1][6]="0";
     return "1";
 };
 
@@ -145,14 +143,16 @@ int process_buttons(int input, int id){
     switch(input){
         case 1:
             printf("enter room");
-            
+            enterRoom(id);
             break;
         case 2:
             printf("exit room");
-            break;
+            leaveRoom(id);
+			break;
         case 3:
             printf("Check temperature");
-            break;
+            checkTemperature(id);
+			break;
         case 4:
             printf("light status");
 			check_lights();
@@ -193,7 +193,7 @@ int main()
 
     int switch_value, converted_switch_value; // These two values will be used to track the binary and decimal switch values respectively
     int button_value, converted_button_value; // These two values will be used to track the binary and decimal button values respectively
-
+	int lastButtonValue = 0;
     while(1){
         for(delay_count=350000; delay_count>0;delay_count--);
         
@@ -210,12 +210,13 @@ int main()
             
             // Set led to current switch, already sanitized
             *(LED_ptr) = read_switches();
-            
+            if(button_value!=lastButtonValue){
             //Check if there is a distinct active push button, cannot check the lights here
             if(4>converted_button_value>0){
                 process_buttons(converted_button_value, converted_switch_value);
                 *(KEY_ptr)=0x00000000;
             }
+		}
             
                 
             
@@ -226,6 +227,8 @@ int main()
                 process_buttons(converted_button_value,0);
             }
         }
+		lastButtonValue = button_value;
+
 
     }
 
