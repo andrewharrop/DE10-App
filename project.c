@@ -160,13 +160,22 @@ int process_buttons(int input, int id){
     }
 }
 
+unsigned int count(unsigned int i) {
+ unsigned int ret=1;
+ while (i/=10){
+	 ret++;
+ }
+	//printf("%d",ret);
+ return ret;
+	
+}
 
 void DisplayHex(int value)
 {
-	/*Make an array of 10 elements each representing hex numbers 1-9 */
+	/*Make an array of 16 elements each representing hex numbers 1-F */
    int lookUpTable[10];
   
-  /*Assign each value in the array to 1-9 according to each hex value*/
+  /*Assign each value in the array to 1-F according to each hex value*/
    lookUpTable[0] = 0x3F;
    lookUpTable[1] = 0x6;
    lookUpTable[2] = 0x5B;
@@ -178,13 +187,38 @@ void DisplayHex(int value)
    lookUpTable[8] = 0x7F;
    lookUpTable[9] = 0x6F;
 
+	
+	
+	
+   /*If the value in the switches is less than 16, set HEX to the corresponding hex value, and display it*/
    if(value < 10)
    {
-   *(HEX_ptr) = lookUpTable[value];
+   //*(HEX_ptr) = value;
+	   *(HEX_ptr) = (lookUpTable[value]);
    }
-    
-    else{
-    }
+	else{
+	unsigned int dig=count(value);
+		unsigned int temp = value;
+	char arr[dig];
+	while (dig--) {
+		printf("%d",value%10);
+ arr[dig]=value%10;
+		//printf("%d",dig);
+ value/=10;
+		
+			
+		//printf("%d",*(HEX_ptr));
+
+}
+				
+if (temp<100){
+	*(HEX_ptr) = (lookUpTable[arr[0]]<<8)|(lookUpTable[arr[1]]);
+}
+if (temp >=100){
+	*(HEX_ptr) = (lookUpTable[arr[0]]<<16)|(lookUpTable[arr[1]]<<8)|(lookUpTable[arr[2]]);
+}
+	}
+   /*If the value is greater than 16, set HEX to zero*/
 };
     
 int main()
