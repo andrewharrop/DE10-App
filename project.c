@@ -201,7 +201,7 @@ void DisplayHex(int value)
 		unsigned int temp = value;
 	char arr[dig];
 	while (dig--) {
-		printf("%d",value%10);
+		
  arr[dig]=value%10;
 		//printf("%d",dig);
  value/=10;
