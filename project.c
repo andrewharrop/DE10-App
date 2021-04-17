@@ -53,6 +53,7 @@ int checkTemperature(id){
     Display temperature on LCD here.
     Display -> Sleep -> Clear
     */
+   // Display "please wait", then display the temperature.  2 second sleep here using a timer
 
 
     //Flag a person if there temperature is not between 35-37.8 degrees celcius
