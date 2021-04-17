@@ -149,7 +149,6 @@ int process_buttons(int input, int id){
             printf("exit room");
             leaveRoom(id);
 			break;
-        case 3:
             printf("Check temperature");
             checkTemperature(id);
 			break;
