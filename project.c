@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -47,8 +46,12 @@ char *leaveRoom(int id){
 
 // Perform temperature check
 int checkTemperature(id){
-    float value = ((rand()%(42-33+1))+33);
-   
+    int value = ((rand()%(42-33+1))+33);
+	*(HEX_ptr) = 0x6d397754;
+	int delay_count;
+	 for(delay_count=3500000; delay_count>0;delay_count--);
+	DisplayHex(value);
+    for(delay_count=3500000; delay_count>0;delay_count--);
     /*
     Display temperature on LCD here.
     Display -> Sleep -> Clear
@@ -59,10 +62,16 @@ int checkTemperature(id){
     //Flag a person if there temperature is not between 35-37.8 degrees celcius
     if(value<37.8&&value>35){
         arr[id-1][4] = "0";
+		*(HEX_ptr) = 0x3d5c5c5e;
+		  for(delay_count=3500000; delay_count>0;delay_count--);
+		*(HEX_ptr) = 0;
         return "0";
     }
     arr[id-1][4] = "1";
 	arr[id-1][6]="0";
+	*(HEX_ptr) = 0x7c775e;
+	  for(delay_count=3500000; delay_count>0;delay_count--);
+	*(HEX_ptr) = 0;
     return "1";
 };
 
