@@ -44,11 +44,22 @@ char *leaveRoom(int id){
     arr[id-1][6]="0";
     return arr[id-1][6];
 };
+// void config_interval_timer()
+// {
+// volatile int * interval_timer_ptr = (int *)TIMER_BASE; // interal timer base address
+// /* set the interval timer period for scrolling the HEX displays */
+// int counter = 5000000; // 1/(100 MHz) x 5x10^6 = 50 msec
+// *(interval_timer_ptr + 0x2) = (counter & 0xFFFF);
+// *(interval_timer_ptr + 0x3) = (counter >> 16) & 0xFFFF;
+// /* start interval timer, enable its interrupts */
+// *(interval_timer_ptr + 1) = 0x7; // STOP = 0, START = 1, CONT = 1, ITO = 1
+// }
 
 // Perform temperature check
 int checkTemperature(id){
-    float value = ((rand()%(42-33+1))+33);
-   
+    int value = ((rand()%(42-33+1))+33);
+    
+    DisplayHex(value);
     /*
     Display temperature on LCD here.
     Display -> Sleep -> Clear
