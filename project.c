@@ -147,6 +147,19 @@ void check_lights(){
 
 	}
 }
+
+void printAttendance(){
+	
+	int i;
+	for (i = 1; i<10;i++){
+		printf("%s",arr[i][1]);
+		printf(" ");
+		printf("%s",arr[i][2]);
+		printf(" ");
+		printf("%s",arr[i][6]);
+			printf("\n");
+	}
+}
 // Conditional execution based on the button pressed.
 int process_buttons(int input, int id){
     printf("\n");
@@ -161,6 +174,16 @@ int process_buttons(int input, int id){
             printf("exit room");
             leaveRoom(id);
             
+			break;
+			
+		case 3:
+			if(id == 1){
+			printf("Attendance Report\n");
+				printAttendance();
+			}
+			else{
+				printf("Error");
+			}
 			break;
         case 4:
             printf("light status");
