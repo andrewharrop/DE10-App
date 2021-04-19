@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -44,22 +43,15 @@ char *leaveRoom(int id){
     arr[id-1][6]="0";
     return arr[id-1][6];
 };
-// void config_interval_timer()
-// {
-// volatile int * interval_timer_ptr = (int *)TIMER_BASE; // interal timer base address
-// /* set the interval timer period for scrolling the HEX displays */
-// int counter = 5000000; // 1/(100 MHz) x 5x10^6 = 50 msec
-// *(interval_timer_ptr + 0x2) = (counter & 0xFFFF);
-// *(interval_timer_ptr + 0x3) = (counter >> 16) & 0xFFFF;
-// /* start interval timer, enable its interrupts */
-// *(interval_timer_ptr + 1) = 0x7; // STOP = 0, START = 1, CONT = 1, ITO = 1
-// }
 
 // Perform temperature check
 int checkTemperature(id){
     int value = ((rand()%(42-33+1))+33);
-    
-    DisplayHex(value);
+	*(HEX_ptr) = 0x6d397754;
+	int delay_count;
+	 for(delay_count=3500000; delay_count>0;delay_count--);
+	DisplayHex(value);
+    for(delay_count=3500000; delay_count>0;delay_count--);
     /*
     Display temperature on LCD here.
     Display -> Sleep -> Clear
@@ -70,10 +62,16 @@ int checkTemperature(id){
     //Flag a person if there temperature is not between 35-37.8 degrees celcius
     if(value<37.8&&value>35){
         arr[id-1][4] = "0";
+		*(HEX_ptr) = 0x3d5c5c5e;
+		  for(delay_count=3500000; delay_count>0;delay_count--);
+		*(HEX_ptr) = 0;
         return "0";
     }
     arr[id-1][4] = "1";
 	arr[id-1][6]="0";
+	*(HEX_ptr) = 0x7c775e;
+	  for(delay_count=3500000; delay_count>0;delay_count--);
+	*(HEX_ptr) = 0;
     return "1";
 };
 
@@ -149,6 +147,19 @@ void check_lights(){
 
 	}
 }
+
+void printAttendance(){
+	
+	int i;
+	for (i = 1; i<10;i++){
+		printf("%s",arr[i][1]);
+		printf(" ");
+		printf("%s",arr[i][2]);
+		printf(" ");
+		printf("%s",arr[i][6]);
+			printf("\n");
+	}
+}
 // Conditional execution based on the button pressed.
 int process_buttons(int input, int id){
     printf("\n");
@@ -163,6 +174,16 @@ int process_buttons(int input, int id){
             printf("exit room");
             leaveRoom(id);
             
+			break;
+			
+		case 3:
+			if(id == 1){
+			printf("Attendance Report\n");
+				printAttendance();
+			}
+			else{
+				printf("Error");
+			}
 			break;
         case 4:
             printf("light status");
